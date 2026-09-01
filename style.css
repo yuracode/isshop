@@ -1,0 +1,132 @@
+/* サイバー購買部 - 授業用スタイル */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+  background-color: #fdf8ef;
+  color: #3a332b;
+  line-height: 1.7;
+}
+
+/* ヘッダー */
+
+.site-header {
+  background-color: #f0932b;
+  color: #ffffff;
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.site-title {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: 0.08em;
+}
+
+.site-lead {
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+
+/* 一覧 */
+
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 28px 20px 48px;
+}
+
+.item-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 18px;
+}
+
+.item {
+  background-color: #ffffff;
+  border: 1px solid #e8ddc8;
+  border-radius: 10px;
+  padding: 18px;
+  text-align: center;
+}
+
+.item-icon {
+  margin: 0;
+  font-size: 40px;
+  line-height: 1.2;
+}
+
+.item-name {
+  margin: 8px 0 4px;
+  font-size: 18px;
+}
+
+.item-category {
+  margin: 0 0 4px;
+  display: inline-block;
+  background-color: #fbeccd;
+  border-radius: 999px;
+  padding: 2px 12px;
+  font-size: 13px;
+  color: #8a6d3b;
+}
+
+.item-price-line {
+  margin: 4px 0 12px;
+  font-size: 15px;
+  color: #c0392b;
+}
+
+.item-price {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.item-stock {
+  margin: 4px 0;
+  font-size: 15px;
+}
+
+.item-description {
+  margin: 12px 0 0;
+  font-size: 14px;
+  text-align: left;
+  color: #5b5145;
+}
+
+.item-link {
+  display: inline-block;
+  background-color: #f0932b;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 6px;
+  padding: 7px 16px;
+  font-size: 14px;
+}
+
+.item-link:hover {
+  background-color: #d97e18;
+}
+
+/* 詳細ページ */
+
+.back-link {
+  margin: 24px 0 0;
+  text-align: center;
+  font-size: 14px;
+}
+
+.back-link a {
+  color: #b3701a;
+}
+
+/* フッター */
+
+.site-footer {
+  border-top: 1px solid #e8ddc8;
+  padding: 16px 20px;
+  text-align: center;
+  font-size: 12px;
+  color: #8c8378;
+}
