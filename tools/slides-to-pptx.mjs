@@ -340,11 +340,32 @@ function layout(slide, b, fs, big) {
   return null;
 }
 
+/**
+ * 生成日時を固定して、中身が同じなら常に同じバイト列になるようにする。
+ * これをしないと、作りなおすたび docProps/core.xml の日時だけが変わり、
+ * 730KB のバイナリ差分が毎回コミットに乗ってしまう。
+ */
+async function freeze(buf) {
+  const JSZip = require("jszip");
+  const FIXED = "2020-01-01T00:00:00Z";
+  const zip = await JSZip.loadAsync(buf);
+  const core = "docProps/core.xml";
+  if (zip.file(core)) {
+    const xml = (await zip.file(core).async("string"))
+      .replace(/(<dcterms:created[^>]*>)[^<]*(<\/dcterms:created>)/, `$1${FIXED}$2`)
+      .replace(/(<dcterms:modified[^>]*>)[^<]*(<\/dcterms:modified>)/, `$1${FIXED}$2`);
+    zip.file(core, xml);
+  }
+  zip.forEach((_, f) => { f.date = new Date(FIXED); });
+  return zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE", compressionOptions: { level: 9 } });
+}
+
 // ---------------------------------------------------------------- 実行
 
 const slides = parse(readFileSync(SRC, "utf8"));
 const pptx = build(slides);
-const buf = await pptx.write({ outputType: "nodebuffer" });
+let buf = await pptx.write({ outputType: "nodebuffer" });
+buf = await freeze(buf);
 writeFileSync(OUT, buf);
 console.log(`${SRC} → ${OUT}  (${slides.length} スライド, ${(buf.length / 1024).toFixed(0)} KB)`);
 if (warnings.length) {

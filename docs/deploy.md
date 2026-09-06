@@ -28,7 +28,11 @@ isshop/
 │   ├── student.ipynb   受講生用（穴埋め）
 │   └── instructor.ipynb 講師用（解答入り）
 ├── tools/
-│   └── slides-to-pptx.mjs  slides.md から編集できる pptx を作る
+│   ├── build-site.py       商品データ → index.html / items/*.html
+│   ├── slides-to-pptx.mjs  slides.md → 編集できる slides.pptx
+│   ├── check-materials.py  教材の整合性を31項目チェック
+│   └── render-slides.sh    pptx を描画して、消えた文字を検出
+├── .claude/skills/         作業手順（Claude Code 用）
 ├── docs/
 │   ├── slides.md       投影用スライド（原稿）
 │   ├── slides.pptx     ↑から生成した PowerPoint（そのまま使える）
@@ -145,9 +149,12 @@ grep -rn "yuracode.github.io" notebooks/ docs/
 `docs/slides.md` を直したら、次のコマンドで作りなおす。
 
 ```bash
-npm install pptxgenjs          # 最初の1回だけ
+npm install                    # 最初の1回だけ（pptxgenjs が入る）
 node tools/slides-to-pptx.mjs  # docs/slides.md → docs/slides.pptx
 ```
+
+生成は決定的で、内容が同じなら何度実行しても同じファイルになる。
+差分が出たら、それは本当に中身が変わったということ。
 
 このスクリプトは**テキストボックスとして組み直す**ので、
 **PowerPoint 側で文字を直せる**。授業に合わせて文言を変えたいときはこちら。
@@ -192,18 +199,15 @@ npx @marp-team/marp-cli@latest docs/slides.md --html -o /tmp/slides.html
 
 #### 変換結果を目で確認する
 
-pptx を開かずに中身を確かめたいときは、LibreOffice で PDF にして画像化する。
-
 ```bash
-sudo apt-get install -y libreoffice-impress poppler-utils fonts-noto-cjk
-
-soffice --headless --convert-to pdf --outdir /tmp docs/slides.pptx
-pdftoppm -png -r 90 /tmp/slides.pdf /tmp/slide     # 1枚ずつ PNG になる
-pdftotext -layout /tmp/slides.pdf -                # 文字が欠けていないか
+sudo apt-get install -y libreoffice-impress poppler-utils fonts-noto-cjk   # 最初の1回
+bash tools/render-slides.sh
 ```
 
-`pdftotext` の出力と `docs/slides.md` を見くらべると、**枠からはみ出して消えた文字**を
-機械的に見つけられる。レイアウトを直したときは、これで全枚数を確認するのが早い。
+PDF と 1枚ずつの PNG を作り、**枠からはみ出して消えた文字**が無いかを
+`docs/slides.md` と全文突き合わせて確認する。
+過去に「pptx の中には文字があるのに描画されると消える」事故が起きているので、
+**スライドを直したら必ず通すこと。**
 
 > Linux には Meiryo / MS Gothic が無いので、この方法での見た目は本番と完全には一致しない。
 > **絵文字は豆腐（□）になる**が、Windows の PowerPoint では正しく出る。
@@ -230,15 +234,48 @@ pdftotext -layout /tmp/slides.pdf -                # 文字が欠けていない
 チェックボックス（`- [ ]`）は、変換方法によって四角が出ないことがある。
 出ない場合は手書き用の枠として `□` に置き換えてよい。
 
-## 6. テーマを差し替えるときは
+## 6. 教材を直したときの確認
+
+**何を直しても、最後にこれを通す。**
+
+```bash
+python3 tools/check-materials.py
+```
+
+商品数・class 名の突合・最安値の一意性・BASE_URL の重複・受講生用ノートブックからの
+外部アクセス・スライドと台本の整合など、31項目を数秒で確認する。外部ツールは要らない。
+
+NG が出た項目には**直す場所も表示される**。
+
+`index.html` や `items/*.html` は `tools/build-site.py` の生成物なので、
+**手で直さないこと。** 商品やテーマを変えるときは、そのファイルの `DATA` を直して
+
+```bash
+python3 tools/build-site.py
+```
+
+で作りなおす。手で直すと `check-materials.py` の「HTML が build-site.py の出力と一致」で落ちる。
+
+## 7. テーマを差し替えるときは
 
 購買部以外のテーマにする場合、書き換えるのは以下だけでよい。
 
-- `index.html`
-- `items/item01.html` 〜 `item30.html`
-- `style.css`（見た目を変える場合）
-- `docs/slides.md` の「商品1つ分の中身」「名札の一覧」スライド
-- `docs/handout.md` の6章（同じ図と表を載せている）
+| ファイル | 何を直すか |
+|---|---|
+| `tools/build-site.py` の `DATA` | 商品そのもの（名前・アイコン・価格・在庫・説明） |
+| `style.css` | 見た目を変える場合 |
+| `docs/slides.md` | 「商品1つ分の中身」「名札の一覧」スライド |
+| `docs/handout.md` | 6章（同じ図と表を載せている） |
+
+直したら再生成と確認。
+
+```bash
+python3 tools/build-site.py
+node tools/slides-to-pptx.mjs
+python3 tools/check-materials.py
+```
+
+> `index.html` と `items/*.html` は**生成物**なので手で直さない。次の生成で消える。
 
 `samples/` はテーマに依存しないので、そのままでよい。
 
@@ -246,11 +283,11 @@ pdftotext -layout /tmp/slides.pdf -                # 文字が欠けていない
 class 名（`item` / `item-name` / `item-price` / `item-category` / `item-stock` / `item-link`）さえ揃っていれば
 そのまま動く。
 
-差し替え時に守ること。
+差し替え時に守ること（`check-materials.py` が自動で確認する）。
 
 - 商品数は30のままにする（`print(len(items))` で `30` を確認する進行になっている）
-- 一覧側の商品カードにも `<p class="item-category">` を入れる（ステップ3の「やってみよう」で使う）
-- 価格は `<span class="item-price">280</span>` のように**数値だけ**を入れる（「280円」にしない）
+- **最安値と最高値は1商品だけ**にする。同額があるとステップ3の答えがぶれる
+- **先頭5商品に3種の在庫を散らす**（ステップ4は `items[:5]` しか見にいかない）
+- 価格は数値だけを入れる（「280円」にしない）
 - 在庫は「あり / 残りわずか / 品切れ」の3種を、**詳細ページ側**に置く
-  （一覧に在庫があるとステップ4の意味がなくなる）
-- `<title>` と `<h1>` は別の文字列にする（ステップ1の「やってみよう」で違いを見せている）
+- `<title>` と `<h1>` は別の文字列にする

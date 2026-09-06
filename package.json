@@ -1,0 +1,11 @@
+{
+  "name": "isshop-materials",
+  "private": true,
+  "description": "高校生向けスクレイピング体験授業の教材。スライド生成にのみ Node を使う。",
+  "scripts": {
+    "slides": "node tools/slides-to-pptx.mjs"
+  },
+  "devDependencies": {
+    "pptxgenjs": "^4.0.1"
+  }
+}
