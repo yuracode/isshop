@@ -19,7 +19,8 @@
 | 2 | 受講生用ノートブック | `notebooks/student.ipynb` | 当日配布。穴埋め形式 |
 | 3 | 講師用ノートブック | `notebooks/instructor.ipynb` | 解答＋補足コメント入り |
 | 4 | 進行台本 | `docs/lesson-plan.md` | タイムテーブルと想定質問 |
-| 5 | 投影用スライド | `docs/slides.md` | Marp 形式。PowerPoint / PDF に変換して投影 |
+| 5 | 投影用スライド | `docs/slides.md` | 原稿。Marp 形式 |
+| 5b | 同上（変換済み） | `docs/slides.pptx` | `tools/slides-to-pptx.mjs` で生成。**編集可能な** PowerPoint |
 | 6 | 受講生用プリント | `docs/handout.md` | A4両面2枚。手元に置く早見表 |
 
 ## 3. 絶対制約
@@ -141,7 +142,12 @@ names = soup.find_all("div", class_="____")   # ← ここだけ埋める
 
 ### `docs/slides.md`
 
-Marp 形式（`marp: true` の front matter ＋ `---` 区切り）。変換手順は `docs/deploy.md`。
+Marp 形式（`marp: true` の front matter ＋ `---` 区切り）。変換手順は `docs/deploy.md` 5章。
+
+配布用の `docs/slides.pptx` は `tools/slides-to-pptx.mjs` で生成する。
+**Marp 公式の `--pptx` は各スライドを画像として貼りこむため使わない**
+（PowerPoint で文言を直せなくなる）。PDF が要るときだけ Marp を使う。
+`docs/slides.md` を直したら **pptx も作りなおしてコミットする**。
 
 - 構成は「第1部：HTML の話」→「第2部：やってみる」→「マナー」→「発展」
 - **第1部で扱うタグは、その日のコードに出てくるものだけ**。網羅しない
@@ -205,7 +211,9 @@ Marp 形式（`marp: true` の front matter ＋ `---` 区切り）。変換手�
       （`grep -c "wikipedia.org\|http" notebooks/student.ipynb` で確認できる）
 - [ ] HTML をブラウザの検証ツールで開き、構造が読める
 - [ ] ステップ3まででちょうど50分程度の分量（第1部の8分を含む）
-- [ ] スライドが PowerPoint に変換でき、絵文字とコードが化けていない
+- [ ] `docs/slides.pptx` が `docs/slides.md` と一致している（片方だけ直っていない）
+- [ ] pptx 生成時に「はみ出しの疑い」の警告が出ていない
+- [ ] 投影して、絵文字とコードが化けていない
 - [ ] プリントが A4両面2枚に収まり、表がページ境界で分断されない
 - [ ] スライド・プリント・ノートブックの3つで、class 名の表記がずれていない
 - [ ] 最安値・最高値の答えが1商品に定まる

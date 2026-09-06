@@ -27,9 +27,12 @@ isshop/
 ├── notebooks/
 │   ├── student.ipynb   受講生用（穴埋め）
 │   └── instructor.ipynb 講師用（解答入り）
+├── tools/
+│   └── slides-to-pptx.mjs  slides.md から編集できる pptx を作る
 ├── docs/
-│   ├── slides.md       投影用スライド（Marp形式）
-│   ├── handout.md      受講生用プリント（A4両面1枚）
+│   ├── slides.md       投影用スライド（原稿）
+│   ├── slides.pptx     ↑から生成した PowerPoint（そのまま使える）
+│   ├── handout.md      受講生用プリント（A4両面2枚）
 │   ├── lesson-plan.md  進行台本
 │   └── deploy.md       このファイル
 └── CLAUDE.md
@@ -134,26 +137,46 @@ grep -rn "yuracode.github.io" notebooks/ docs/
 `docs/slides.md` は **Marp** 形式、`docs/handout.md` はふつうの Markdown。
 どちらもリポジトリに置いてあるのは**元原稿**で、配布物は各自で変換する。
 
-### 5-1. スライド → PowerPoint / PDF
+### 5-1. スライド → PowerPoint
 
-**いちばん簡単なのは VS Code の拡張機能。**
+**`docs/slides.pptx` はリポジトリに置いてある。**
+そのままダウンロードして使えるので、ふだんは変換の必要はない。
 
-1. VS Code に **Marp for VS Code** をインストール
-2. `docs/slides.md` を開く
-3. 右上のプレビューボタンで表示を確認
-4. コマンドパレット → `Marp: Export Slide Deck...` → `.pptx` または `.pdf` を選ぶ
-
-コマンドラインでもできる（Node.js が必要）。
+`docs/slides.md` を直したら、次のコマンドで作りなおす。
 
 ```bash
-npx @marp-team/marp-cli@latest docs/slides.md --pptx
+npm install pptxgenjs          # 最初の1回だけ
+node tools/slides-to-pptx.mjs  # docs/slides.md → docs/slides.pptx
+```
+
+このスクリプトは**テキストボックスとして組み直す**ので、
+**PowerPoint 側で文字を直せる**。授業に合わせて文言を変えたいときはこちら。
+
+内容がスライドの下からはみ出しそうな場合、実行時に警告が出る。
+出たら、そのスライドの行数を減らすか2枚に分ける。
+
+#### Marp を使う場合（見た目を忠実に、PDF が欲しいとき）
+
+`docs/slides.md` は Marp 形式でもある。**PDF を作るならこちら**が確実。
+
+1. VS Code に **Marp for VS Code** をインストール
+2. `docs/slides.md` を開き、右上のプレビューで確認
+3. コマンドパレット → `Marp: Export Slide Deck...` → `.pdf`
+
+```bash
 npx @marp-team/marp-cli@latest docs/slides.md --pdf
 ```
 
-> **WSL から実行すると失敗することがある。**
-> Marp の PowerPoint / PDF 出力は内部で Chrome を動かす。Chrome が Windows 側にしか
-> 無い環境（WSL2）では、WSL から起動できず `ERR_UNHANDLED_REJECTION` で落ちる。
-> その場合は **Windows 側の PowerShell から実行する**か、VS Code 拡張を使う。
+> **Marp の `--pptx` は各スライドを画像として貼りこむ。**
+> 見た目は Markdown どおりになるが、**PowerPoint で文字を編集できない**。
+> 編集したいなら上のスクリプトを使うこと。
+
+> **WSL から実行すると失敗する。**
+> Marp は内部で Chrome を動かす。Chrome が Windows 側にしか無い WSL2 では起動できず
+> `ERR_UNHANDLED_REJECTION` で落ちる。WSL 内の Chrome も
+> `libnss3` `libnspr4` `libasound2` が無いと動かない
+> （`sudo apt install libnss3 libasound2t64` で入る）。
+> **Windows 側の PowerShell から実行するか、VS Code 拡張を使うのが早い。**
 > `--html` 出力だけは Chrome 不要なので、内容の確認には使える。
 
 ```bash
@@ -166,6 +189,25 @@ npx @marp-team/marp-cli@latest docs/slides.md --html -o /tmp/slides.html
 - 絵文字（🍈 など）が豆腐（□）になっていないか
 - コード部分が折り返されて読めなくなっていないか
 - 教室のいちばん後ろの席から本文が読めるか
+
+#### 変換結果を目で確認する
+
+pptx を開かずに中身を確かめたいときは、LibreOffice で PDF にして画像化する。
+
+```bash
+sudo apt-get install -y libreoffice-impress poppler-utils fonts-noto-cjk
+
+soffice --headless --convert-to pdf --outdir /tmp docs/slides.pptx
+pdftoppm -png -r 90 /tmp/slides.pdf /tmp/slide     # 1枚ずつ PNG になる
+pdftotext -layout /tmp/slides.pdf -                # 文字が欠けていないか
+```
+
+`pdftotext` の出力と `docs/slides.md` を見くらべると、**枠からはみ出して消えた文字**を
+機械的に見つけられる。レイアウトを直したときは、これで全枚数を確認するのが早い。
+
+> Linux には Meiryo / MS Gothic が無いので、この方法での見た目は本番と完全には一致しない。
+> **絵文字は豆腐（□）になる**が、Windows の PowerPoint では正しく出る。
+> 位置関係とはみ出しの確認に使うもの、と割り切ること。
 
 ### 5-2. プリント → PDF
 
