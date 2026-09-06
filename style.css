@@ -13,29 +13,60 @@ body {
 
 .site-header {
   background-color: #f0932b;
+  background-image: linear-gradient(180deg, #f5a742, #ec8a1c);
   color: #ffffff;
-  padding: 24px 20px;
+  padding: 26px 20px;
   text-align: center;
 }
 
 .site-title {
   margin: 0;
-  font-size: 28px;
-  letter-spacing: 0.08em;
+  font-size: 30px;
+  letter-spacing: 0.1em;
 }
 
 .site-lead {
   margin: 6px 0 0;
   font-size: 14px;
+  opacity: 0.95;
+}
+
+/* 本文の枠 */
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 28px 20px 56px;
+}
+
+.item-count {
+  margin: 0 0 24px;
+  text-align: center;
+  font-size: 14px;
+  color: #8c8378;
+}
+
+.item-total {
+  font-size: 18px;
+  font-weight: bold;
+  color: #b3701a;
+}
+
+/* カテゴリ */
+
+.category {
+  margin-bottom: 36px;
+}
+
+.category-name {
+  margin: 0 0 14px;
+  padding-left: 12px;
+  border-left: 5px solid #f0932b;
+  font-size: 19px;
+  letter-spacing: 0.04em;
 }
 
 /* 一覧 */
-
-main {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 28px 20px 48px;
-}
 
 .item-list {
   display: grid;
@@ -46,9 +77,10 @@ main {
 .item {
   background-color: #ffffff;
   border: 1px solid #e8ddc8;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 18px;
   text-align: center;
+  box-shadow: 0 1px 3px rgba(120, 100, 60, 0.08);
 }
 
 .item-icon {
@@ -58,12 +90,12 @@ main {
 }
 
 .item-name {
-  margin: 8px 0 4px;
+  margin: 8px 0 6px;
   font-size: 18px;
 }
 
 .item-category {
-  margin: 0 0 4px;
+  margin: 0 0 6px;
   display: inline-block;
   background-color: #fbeccd;
   border-radius: 999px;
@@ -83,18 +115,6 @@ main {
   font-weight: bold;
 }
 
-.item-stock {
-  margin: 4px 0;
-  font-size: 15px;
-}
-
-.item-description {
-  margin: 12px 0 0;
-  font-size: 14px;
-  text-align: left;
-  color: #5b5145;
-}
-
 .item-link {
   display: inline-block;
   background-color: #f0932b;
@@ -110,6 +130,23 @@ main {
 }
 
 /* 詳細ページ */
+
+.item-stock {
+  display: inline-block;
+  margin: 6px 0;
+  border: 1px solid #e0d3b8;
+  border-radius: 999px;
+  padding: 3px 16px;
+  background-color: #fbf6ea;
+  font-size: 15px;
+}
+
+.item-description {
+  margin: 14px 0 0;
+  font-size: 14px;
+  text-align: left;
+  color: #5b5145;
+}
 
 .back-link {
   margin: 24px 0 0;
@@ -129,4 +166,21 @@ main {
   text-align: center;
   font-size: 12px;
   color: #8c8378;
+}
+
+/* 画面が狭いとき */
+
+@media (max-width: 480px) {
+  .site-title {
+    font-size: 24px;
+  }
+
+  .item-list {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  main {
+    padding: 20px 14px 40px;
+  }
 }
