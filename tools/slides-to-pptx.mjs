@@ -131,6 +131,17 @@ function blocks(body) {
       out.push({ t: "quote", lines: buf });
       continue;
     }
+    if (/^\d+[.)]\s+/.test(l)) {                                // 番号つき箇条書き
+      const items = [];
+      while (i < lines.length && (/^\d+[.)]\s+/.test(lines[i]) || /^\s{2,}\S/.test(lines[i]))) {
+        if (/^\d+[.)]\s+/.test(lines[i])) items.push(lines[i].replace(/^\d+[.)]\s+/, ""));
+        else items[items.length - 1] += " " + lines[i].trim();
+        i++;
+      }
+      i--;
+      out.push({ t: "olist", items });
+      continue;
+    }
     if (/^[-*]\s+/.test(l)) {                                   // 箇条書き
       const items = [];
       while (i < lines.length && (/^[-*]\s+/.test(lines[i]) || /^\s{2,}\S/.test(lines[i]))) {
@@ -144,7 +155,7 @@ function blocks(body) {
     }
     const buf = [l];                                            // 段落
     while (i + 1 < lines.length && lines[i + 1].trim() &&
-           !/^([-*>|#]|```)/.test(lines[i + 1])) buf.push(lines[++i]);
+           !/^([-*>|#]|```|\d+[.)]\s)/.test(lines[i + 1])) buf.push(lines[++i]);
     out.push({ t: "p", lines: buf });
   }
   return out;
@@ -167,6 +178,23 @@ function runs(text, base) {
   }
   if (last < text.length) parts.push({ text: text.slice(last), options: { ...base } });
   return parts.length ? parts : [{ text, options: { ...base } }];
+}
+
+/**
+ * 複数行のテキストを、行ごとのランに分ける。
+ * 1つのランの中に "\n" を残すと、pptxgenjs がその前後で改行を入れてしまい、
+ * 「2.」だけが1行になるような崩れかたをする（実際に起きた）。改行は breakLine で表す。
+ */
+function multilineRuns(lines, base) {
+  const out = [];
+  lines.forEach((line, i) => {
+    const parts = runs(line, base);
+    parts.forEach((p, j) => out.push({
+      text: p.text,
+      options: { ...p.options, breakLine: j === parts.length - 1 && i < lines.length - 1 },
+    }));
+  });
+  return out;
 }
 
 const plain = (t) => t.replace(/\*\*/g, "").replace(/`/g, "");
@@ -314,11 +342,28 @@ function layout(slide, b, fs, big) {
   }
 
   if (b.t === "p") {
-    const txt = b.lines.join("\n");
-    const h = textH(txt, BODY_W, fs);
+    const h = textH(b.lines.join("\n"), BODY_W, fs);
     return { h: h + 0.16, draw: (y) =>
-      slide.addText(runs(txt, { fontSize: fs, color: C.text, fontFace: FONT }),
+      slide.addText(multilineRuns(b.lines, { fontSize: fs, color: C.text, fontFace: FONT }),
         { x: MX, y, w: BODY_W, h, valign: "top", fit: "shrink" }) };
+  }
+
+  if (b.t === "olist") {                                      // 1. 2. 3. の箇条書き
+    const w = BODY_W - 0.45;
+    const hs = b.items.map((it) => textH(it, w - 0.2, fs, 0.06));
+    return {
+      h: hs.reduce((a, v) => a + v + 0.04, 0) + 0.12,
+      draw: (y) => {
+        let cy = y;
+        b.items.forEach((it, i) => {
+          slide.addText(runs(it, { fontSize: fs, color: C.text, fontFace: FONT }), {
+            x: MX + 0.45, y: cy, w, h: hs[i], valign: "top", fit: "shrink",
+            bullet: { type: "number", startAt: i + 1 },   // 1項目ずつ別の箱なので、番号は自分で送る
+          });
+          cy += hs[i] + 0.04;
+        });
+      },
+    };
   }
 
   if (b.t === "list") {
@@ -343,7 +388,7 @@ function layout(slide, b, fs, big) {
     const h = textH(txt, BODY_W - 0.35, fs - 1, 0.22);
     return { h: h + 0.18, draw: (y) => {
       slide.addShape("rect", { x: MX, y, w: 0.1, h, fill: { color: C.rule } });
-      slide.addText(runs(txt, { fontSize: fs - 1, color: C.quote, fontFace: FONT, strongColor: C.quote }),
+      slide.addText(multilineRuns(b.lines, { fontSize: fs - 1, color: C.quote, fontFace: FONT, strongColor: C.quote }),
         { x: MX + 0.3, y, w: BODY_W - 0.3, h, valign: "middle", fit: "shrink" });
     } };
   }
