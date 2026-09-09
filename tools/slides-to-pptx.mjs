@@ -23,12 +23,23 @@ try {
 const SRC = process.argv[2] ?? "docs/slides.md";
 const OUT = process.argv[3] ?? "docs/slides.pptx";
 
-// 練習用サイトと同じ配色
+/**
+ * 練習用サイトの配色を、プロジェクター向けにコントラストを上げて調整したもの。
+ * 教室のスクリーンは色が飛んで薄く見えるので、地は白に寄せ、文字は黒に寄せる。
+ * かっこ内は地（bg / titleBg / sectionBg）に対するコントラスト比。
+ */
 const C = {
-  bg: "FDF8EF", text: "3A332B", accent: "B3701A", rule: "F0932B",
-  strong: "C0392B", codeBg: "FFFFFF", codeBorder: "E8DDC8",
-  inlineBg: "FBECCD", inlineFg: "8A5A10", thBg: "FBECCD",
-  quote: "6B5F4F", titleBg: "F0932B", sectionBg: "3A332B", sectionFg: "F5A742",
+  bg: "FFFCF6",        // ほぼ白。もとの FDF8EF は投影すると文字が沈む
+  text: "1A1512",      // ほぼ黒 (16.5:1)
+  accent: "8A4A00",    // 見出しの茶オレンジ (7.4:1)
+  rule: "E07B00",      // 見出しの下線。装飾なので鮮やかさを残す
+  strong: "9E1B12",    // 強調の赤 (7.9:1)
+  codeBg: "FFFFFF", codeBorder: "C7B48E",
+  inlineBg: "F6E0B0", inlineFg: "6B3A00",   // 本文中の `コード` (9.5:1)
+  thBg: "F2D9A6",      // 表の見出し行
+  quote: "3F3830",     // 引用 (10.6:1)
+  titleBg: "C06600",   // タイトルの地。もとの F0932B に白文字は 2.3:1 で読めない
+  sectionBg: "241F19", sectionFg: "FFB459", // 中扉の見出し (8.7:1)
   white: "FFFFFF",
 };
 const FONT = "Meiryo";        // Windows・Mac どちらにもある無難な和文フォント
@@ -171,8 +182,8 @@ function build(slides) {
 
   slides.forEach((s, i) => {
     const slide = pptx.addSlide();
-    if (s.cls === "title")        renderCentered(slide, s, C.titleBg, C.white, C.white, 40);
-    else if (s.cls === "section") renderCentered(slide, s, C.sectionBg, C.sectionFg, C.white, 36);
+    if (s.cls === "title")        renderCentered(slide, s, C.titleBg, C.white, C.white, 46);
+    else if (s.cls === "section") renderCentered(slide, s, C.sectionBg, C.sectionFg, C.white, 42);
     else {
       const bottom = renderNormal(slide, s, s.cls === "big");
       if (bottom > PAGE_H - 0.3) {
@@ -202,13 +213,13 @@ function renderCentered(slide, s, bg, headFg, bodyFg, headSize) {
   }
   if (sub) {
     slide.addText(plain(sub.text), {
-      x: MX, y, w: BODY_W, h: 0.8, fontSize: 24, color: bodyFg, fontFace: FONT, align: "center",
+      x: MX, y, w: BODY_W, h: 0.8, fontSize: 28, bold: true, color: bodyFg, fontFace: FONT, align: "center",
     });
     y += 0.9;
   }
   for (const b of rest) {
     if (b.t !== "p") continue;
-    slide.addText(runs(b.lines.join(" "), { fontSize: 18, color: bodyFg, fontFace: FONT, strongColor: bodyFg, codeColor: bodyFg }), {
+    slide.addText(runs(b.lines.join(" "), { fontSize: 24, bold: true, color: bodyFg, fontFace: FONT, strongColor: bodyFg, codeColor: bodyFg }), {
       x: MX, y, w: BODY_W, h: 0.6, align: "center",
     });
     y += 0.7;
@@ -217,17 +228,17 @@ function renderCentered(slide, s, bg, headFg, bodyFg, headSize) {
 
 function renderNormal(slide, s, big) {
   slide.background = { color: C.bg };
-  const fs = big ? 22 : 18;
-  let y = 0.45;
+  const fs = big ? 28 : 24;
+  let y = 0.4;
 
   const head = s.blocks.find((b) => b.t === "h" && b.level === 1);
   if (head) {
-    const hPt = big ? 32 : 30;
-    const hh = Math.max(0.8, textH(plain(head.text), BODY_W, hPt, 0.1));
+    const hPt = big ? 40 : 36;
+    const hh = Math.max(0.85, textH(plain(head.text), BODY_W, hPt, 0.1));
     slide.addText(runs(head.text, { fontSize: hPt, bold: true, color: C.accent, fontFace: FONT, strongColor: C.accent, codeColor: C.accent }), {
       x: MX, y, w: BODY_W, h: hh, valign: "middle", fit: "shrink",
     });
-    slide.addShape("rect", { x: MX, y: y + hh + 0.02, w: BODY_W, h: 0.05, fill: { color: C.rule } });
+    slide.addShape("rect", { x: MX, y: y + hh + 0.02, w: BODY_W, h: 0.08, fill: { color: C.rule } });
     y += hh + 0.35;
   }
 
@@ -242,7 +253,7 @@ function renderNormal(slide, s, big) {
 
   // 2回目：残りの高さの中央に寄せて描く（寄せすぎないよう上限あり）
   const bottom = PAGE_H - 0.45;
-  const offset = Math.min(0.9, Math.max(0, (bottom - y - total) / 2));
+  const offset = Math.min(1.2, Math.max(0, (bottom - y - total) / 2));
   let cy = y + offset;
   for (const op of ops) { op.draw(cy); cy += op.h; }
   return cy;
@@ -251,9 +262,9 @@ function renderNormal(slide, s, big) {
 /** ブロック1つぶんの高さと描画手順を返す */
 function layout(slide, b, fs, big) {
   if (b.t === "h") {
-    const h = textH(plain(b.text), BODY_W, 22, 0.1);
+    const h = textH(plain(b.text), BODY_W, 28, 0.1);
     return { h: h + 0.12, draw: (y) =>
-      slide.addText(runs(b.text, { fontSize: 22, bold: true, color: C.accent, fontFace: FONT }),
+      slide.addText(runs(b.text, { fontSize: 28, bold: true, color: C.accent, fontFace: FONT }),
         { x: MX, y, w: BODY_W, h }) };
   }
 
@@ -286,17 +297,19 @@ function layout(slide, b, fs, big) {
     const txt = b.lines.join("\n");
     const h = textH(txt, BODY_W - 0.35, fs - 1, 0.22);
     return { h: h + 0.18, draw: (y) => {
-      slide.addShape("rect", { x: MX, y, w: 0.07, h, fill: { color: C.rule } });
-      slide.addText(runs(txt, { fontSize: fs - 1, color: C.quote, italic: true, fontFace: FONT, strongColor: C.quote }),
+      slide.addShape("rect", { x: MX, y, w: 0.1, h, fill: { color: C.rule } });
+      slide.addText(runs(txt, { fontSize: fs - 1, color: C.quote, fontFace: FONT, strongColor: C.quote }),
         { x: MX + 0.3, y, w: BODY_W - 0.3, h, valign: "middle", fit: "shrink" });
     } };
   }
 
   if (b.t === "code") {
-    // 一番長い行が収まるところまで文字を小さくする（折り返させない）
+    // 一番長い行が収まるところまで文字を小さくする（折り返させない）。
+    // 行数が多いブロックは縦にもあふれるので、そのぶん上限を下げる。
     const inner = BODY_W - 0.36;
     const widest = Math.max(...b.lines.map(emWidth), 1);
-    const codePt = Math.min(15, Math.floor(((inner * 72) / widest) * 10) / 10);
+    const cap = b.lines.length >= 9 ? 17 : b.lines.length >= 6 ? 19 : 20;
+    const codePt = Math.min(cap, Math.floor(((inner * 72) / widest) * 10) / 10);
     const h = b.lines.length * lineH(codePt) + 0.3;
     return { h: h + 0.2, draw: (y) => {
       slide.addShape("roundRect", {
@@ -320,7 +333,7 @@ function layout(slide, b, fs, big) {
     const scale = BODY_W / raw.reduce((a, v) => a + v, 0);
     const cols = raw.map((v) => v * scale);
 
-    const tPt = big ? 17 : ncol >= 4 ? 14 : 15;
+    const tPt = big ? 22 : ncol >= 4 ? 18 : 20;
     const pad = 0.16;
     const rowHs = b.rows.map((r) =>
       Math.max(0.42, Math.max(...r.map((c, i) => lineCount(plain(c), cols[i] - pad, tPt) * lineH(tPt))) + 0.16));

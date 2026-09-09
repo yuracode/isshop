@@ -9,27 +9,27 @@ title: Webページから情報を取り出してみよう
 
 <style>
 section {
-  background-color: #fdf8ef;
-  color: #3a332b;
+  background-color: #fffcf6;
+  color: #1a1512;
   font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
   font-size: 26px;
   line-height: 1.7;
   padding: 50px 60px;
 }
-h1 { color: #b3701a; font-size: 46px; border-bottom: 5px solid #f0932b; padding-bottom: 10px; }
-h2 { color: #b3701a; font-size: 36px; }
-strong { color: #c0392b; }
-code { background-color: #fbeccd; color: #8a5a10; padding: 2px 6px; border-radius: 4px; }
-pre { background-color: #ffffff; border: 1px solid #e8ddc8; border-radius: 8px; font-size: 22px; }
-pre code { background-color: transparent; color: #3a332b; }
+h1 { color: #8a4a00; font-size: 46px; border-bottom: 6px solid #e07b00; padding-bottom: 10px; }
+h2 { color: #8a4a00; font-size: 36px; }
+strong { color: #9e1b12; }
+code { background-color: #f6e0b0; color: #6b3a00; padding: 2px 6px; border-radius: 4px; }
+pre { background-color: #ffffff; border: 1px solid #c7b48e; border-radius: 8px; font-size: 22px; }
+pre code { background-color: transparent; color: #1a1512; }
 table { font-size: 24px; }
-th { background-color: #fbeccd; }
-blockquote { border-left: 6px solid #f0932b; padding-left: 20px; color: #6b5f4f; }
-section.title { background-color: #f0932b; color: #ffffff; justify-content: center; text-align: center; }
+th { background-color: #f2d9a6; }
+blockquote { border-left: 8px solid #e07b00; padding-left: 20px; color: #3f3830; }
+section.title { background-color: #c06600; color: #ffffff; justify-content: center; text-align: center; }
 section.title h1 { color: #ffffff; border-bottom: none; font-size: 58px; }
 section.title p { font-size: 28px; }
-section.section { background-color: #3a332b; color: #ffffff; justify-content: center; text-align: center; }
-section.section h1 { color: #f5a742; border-bottom: none; font-size: 52px; }
+section.section { background-color: #241f19; color: #ffffff; justify-content: center; text-align: center; }
+section.section h1 { color: #ffb459; border-bottom: none; font-size: 52px; }
 section.big { font-size: 34px; }
 section.big h1 { font-size: 50px; }
 footer { color: #a89a86; }

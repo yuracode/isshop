@@ -219,6 +219,7 @@ names = soup.find_all("div", class_="____")   # ← ここだけ埋める
 | Wikipedia は保存版を読む | **負荷が理由ではない**（20人は Wikipedia には誤差）。学校の共有IPで並列に見えること、記事が当日書き換わること、マナーの話の直後に外へ出るとメッセージが逆になること |
 | Wikipedia は「行儀よくならいい」 | robots.txt に "Friendly, low-speed bots are welcome viewing article pages" とある。ただし `python-requests` の既定 UA では **403 が返る**（実測） |
 | `--pptx` に Marp を使わない | 各スライドを画像として貼りこむので PowerPoint で文言を直せない。PDF が要るときだけ Marp |
+| スライドは投影向けの配色・サイズ | 教室のスクリーンは色が飛ぶ。地は白寄り（`#fffcf6`）、文字はほぼ黒（`#1a1512`）、見出しは `#8a4a00`。本文 24pt・表 18〜22pt・コード最大 20pt。配色は `slides-to-pptx.mjs` の `C` と `slides.md` の `<style>` の両方にある |
 | pptxgenjs は `LAYOUT_WIDE` | `LAYOUT_16x9` は **10×5.625in** で 13.3×7.5in ではない。取り違えると右が切れ、下があふれた要素が消える |
 | スライドは描画して確認する | 高さの見積もりだけでは「pptx に文字はあるのに描画されると消える」事故が起きる。`render-slides.sh` が全文突き合わせる |
 | HTML は生成物にした | 30ページを手で揃えるのは無理。`build-site.py` の `DATA` が唯一のソース |
