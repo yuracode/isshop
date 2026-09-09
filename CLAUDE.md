@@ -23,16 +23,34 @@
 | `docs/lesson-plan.md` | 進行台本 | ○ |
 | `docs/deploy.md` | 公開・変換の手順 | ○ |
 | `tools/` | 生成とチェックのスクリプト | ○ |
+| `README.md` | GitHub の入口（Colab バッジ・公開URL・ステップ表） | ○ **チェッカーが見ていない。手で直す** |
 
 ### コマンド
 
 ```bash
 python3 tools/build-site.py       # DATA → index.html / items/*.html
-node tools/slides-to-pptx.mjs     # slides.md → slides.pptx（要 npm install pptxgenjs）
+node tools/slides-to-pptx.mjs     # slides.md → slides.pptx（npm run slides でも同じ）
 python3 tools/check-materials.py  # 教材の整合性を31項目チェック（外部ツール不要）
 bash tools/render-slides.sh       # pptx を描画して、消えた文字が無いか確認
 bash tools/slides-to-pdf.sh       # slides.pptx → slides.pdf（Windows の PowerPoint 経由）
 ```
+
+`slides-to-pptx.mjs` は入力と出力を引数で差し替えられる（既定は `docs/slides.md` → `docs/slides.pptx`）。
+**直す前後の pptx を別名で出して見くらべる**ときはこれを使う。
+
+```bash
+node tools/slides-to-pptx.mjs docs/slides.md /tmp/before.pptx
+```
+
+必要なものは3系統に分かれていて、揃っていないものは各スクリプトが最初に教えてくれる。
+
+| やること | 要るもの |
+|---|---|
+| pptx の生成 | Node と `npm install`（`pptxgenjs`） |
+| 描画確認（`render-slides.sh`） | Linux 側の `soffice` / `pdftoppm` / Noto CJK |
+| PDF 化（`slides-to-pdf.sh`） | Windows 側の PowerPoint（WSL から呼ぶ。詳細は `docs/deploy.md`） |
+
+`build-site.py` と `check-materials.py` は Python だけで動く。外部ツールは要らない。
 
 **何を直しても、最後に `check-materials.py` を通す。**
 
@@ -191,11 +209,12 @@ names = soup.find_all("div", class_="____")   # ← ここだけ埋める
 | 変えたもの | 一緒に直す |
 |---|---|
 | 商品・価格・カテゴリ | `tools/build-site.py` → 再生成。数を変えたなら `edit-site` スキルの表 |
-| 商品数 | 上に加えてノートブック・スライド・プリント・台本・`EXPECTED_ITEMS` |
+| 商品数 | 上に加えてノートブック・スライド・プリント・台本・`EXPECTED_ITEMS`・`README.md` |
+| ステップの構成（増減・入れ替え） | ノートブック・スライド・プリント・台本・`README.md` のステップ表 |
 | class 名 | サイト・ノートブック・スライド6章・プリント6章 |
 | `docs/slides.md` | `docs/slides.pptx` と `docs/slides.pdf` を再生成。枚数が変わったら台本の「スライドN〜M」 |
 | ステップの所要時間 | 台本のタイムテーブル（コマごとに 00:00 から積み上げ、1コマ50分以内） |
-| 公開URL | ノートブックの `BASE_URL` とステップ0のリンク、台本、`deploy.md` |
+| 公開URL | ノートブックの `BASE_URL` とステップ0のリンク、台本、`deploy.md`、`README.md`（Colab バッジのリンクも） |
 | `samples/` の記事 | ステップ7が前提にする3点（`add-snapshot` スキル） |
 
 ## 8. 公開
