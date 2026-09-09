@@ -162,9 +162,25 @@ node tools/slides-to-pptx.mjs  # docs/slides.md → docs/slides.pptx
 内容がスライドの下からはみ出しそうな場合、実行時に警告が出る。
 出たら、そのスライドの行数を減らすか2枚に分ける。
 
-#### Marp を使う場合（見た目を忠実に、PDF が欲しいとき）
+### 5-1b. スライド → PDF
 
-`docs/slides.md` は Marp 形式でもある。**PDF を作るならこちら**が確実。
+**`docs/slides.pdf` はリポジトリに置いてある。** 投影機に PowerPoint が無いとき、
+生徒に配るとき、印刷するときはこれを使う。52ページ・16:9（960×540pt）。
+
+`docs/slides.pptx` を作りなおしたら、次のコマンドで PDF も作りなおす。
+
+```bash
+bash tools/slides-to-pdf.sh    # docs/slides.pptx → docs/slides.pdf
+```
+
+Windows の PowerPoint に変換させている（WSL から `powershell.exe` を呼ぶ）。
+**pptx が正、PDF はその写し**、という関係にしてある。Marp から直接 PDF を作ると、
+`slides-to-pptx.mjs` が入れているタグの色分け（開きタグと閉じタグを同じ色にする）が
+出ないため、投影するものと配るものが食い違う。
+
+#### Marp を使う場合（Markdown の見た目のまま出したいとき）
+
+`docs/slides.md` は Marp 形式でもある。
 
 1. VS Code に **Marp for VS Code** をインストール
 2. `docs/slides.md` を開き、右上のプレビューで確認

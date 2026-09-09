@@ -18,6 +18,7 @@
 | `notebooks/instructor.ipynb` | 講師用（解答＋メモ） | ○ |
 | `docs/slides.md` | 投影用スライドの原稿（Marp） | ○ |
 | `docs/slides.pptx` | 配布用 PowerPoint | **✗ 生成物。原稿を直して再生成** |
+| `docs/slides.pdf` | 配布・印刷用 PDF | **✗ 生成物。pptx から再生成** |
 | `docs/handout.md` | 受講生用プリント（A4両面2枚） | ○ |
 | `docs/lesson-plan.md` | 進行台本 | ○ |
 | `docs/deploy.md` | 公開・変換の手順 | ○ |
@@ -30,6 +31,7 @@ python3 tools/build-site.py       # DATA → index.html / items/*.html
 node tools/slides-to-pptx.mjs     # slides.md → slides.pptx（要 npm install pptxgenjs）
 python3 tools/check-materials.py  # 教材の整合性を31項目チェック（外部ツール不要）
 bash tools/render-slides.sh       # pptx を描画して、消えた文字が無いか確認
+bash tools/slides-to-pdf.sh       # slides.pptx → slides.pdf（Windows の PowerPoint 経由）
 ```
 
 **何を直しても、最後に `check-materials.py` を通す。**
@@ -186,7 +188,7 @@ names = soup.find_all("div", class_="____")   # ← ここだけ埋める
 | 商品・価格・カテゴリ | `tools/build-site.py` → 再生成。数を変えたなら `edit-site` スキルの表 |
 | 商品数 | 上に加えてノートブック・スライド・プリント・台本・`EXPECTED_ITEMS` |
 | class 名 | サイト・ノートブック・スライド6章・プリント6章 |
-| `docs/slides.md` | `docs/slides.pptx` を再生成。枚数が変わったら台本の「スライドN〜M」 |
+| `docs/slides.md` | `docs/slides.pptx` と `docs/slides.pdf` を再生成。枚数が変わったら台本の「スライドN〜M」 |
 | ステップの所要時間 | 台本のタイムテーブル（開始時刻の積み上げ） |
 | 公開URL | ノートブックの `BASE_URL` とステップ0のリンク、台本、`deploy.md` |
 | `samples/` の記事 | ステップ5が前提にする3点（`add-snapshot` スキル） |
