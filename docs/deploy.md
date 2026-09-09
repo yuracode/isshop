@@ -21,7 +21,7 @@ isshop/
 │   └── item30.html
 ├── style.css                                  … 公開される
 ├── samples/
-│   ├── wikipedia-melonpan.html  ステップ5で読む保存版 … 公開される
+│   ├── wikipedia-melonpan.html  ステップ7で読む保存版 … 公開される
 │   └── README.md       出典・ライセンス・取り直し手順
 ├── .nojekyll           Jekyll による変換を止める
 ├── notebooks/
@@ -31,11 +31,13 @@ isshop/
 │   ├── build-site.py       商品データ → index.html / items/*.html
 │   ├── slides-to-pptx.mjs  slides.md → 編集できる slides.pptx
 │   ├── check-materials.py  教材の整合性を31項目チェック
+│   ├── slides-to-pdf.sh    pptx → 配布用 PDF（PowerPoint 経由）
 │   └── render-slides.sh    pptx を描画して、消えた文字を検出
 ├── .claude/skills/         作業手順（Claude Code 用）
 ├── docs/
 │   ├── slides.md       投影用スライド（原稿）
 │   ├── slides.pptx     ↑から生成した PowerPoint（そのまま使える）
+│   ├── slides.pdf      ↑から生成した配布用 PDF
 │   ├── handout.md      受講生用プリント（A4両面2枚）
 │   ├── lesson-plan.md  進行台本
 │   └── deploy.md       このファイル
@@ -93,13 +95,13 @@ Settings → Pages の上部に緑のチェックと公開URLが表示されれ�
 - [ ] 詳細ページの「商品一覧にもどる」で戻れる
 - [ ] スマートフォンで開いてもレイアウトが崩れない
 - [ ] **学校のネットワークから開ける**（フィルタリングで塞がれていないか）
-- [ ] ステップ5をやる回は https://yuracode.github.io/isshop/samples/wikipedia-melonpan.html が開ける
+- [ ] ステップ7をやる回は https://yuracode.github.io/isshop/samples/wikipedia-melonpan.html が開ける
       （装飾が当たらず素っ気ない見た目になるのが正常。`<link>` を外してあるため）
 
 さらに、`notebooks/instructor.ipynb` を Colab で開き、**上から順に全セル実行して通ること**を確認する。
-ステップ4まで含めて1分程度で終わる（ステップ4は先頭5商品だけを巡回する）。
+ステップ6まで含めて1分程度で終わる（ステップ6は先頭5商品だけを巡回する）。
 
-> **`instructor.ipynb` の 5-5 だけは外部（Wikipedia の API）にアクセスする。**
+> **`instructor.ipynb` の 7-5 だけは外部（Wikipedia の API）にアクセスする。**
 > 授業では講師機で1回だけ実行するセル。`student.ipynb` には入れていないので、
 > **生徒側からの外部アクセスは1件もない。**
 
@@ -131,7 +133,7 @@ grep -rn "yuracode.github.io" notebooks/ docs/
 で全箇所を洗い出せる。
 
 > **末尾のスラッシュを必ず残す。**
-> ステップ4で `BASE_URL + "items/item01.html"` のように連結しているため、
+> ステップ6で `BASE_URL + "items/item01.html"` のように連結しているため、
 > `.../shop`（スラッシュなし）にすると詳細ページが取得できなくなる。
 
 ---
@@ -165,7 +167,7 @@ node tools/slides-to-pptx.mjs  # docs/slides.md → docs/slides.pptx
 ### 5-1b. スライド → PDF
 
 **`docs/slides.pdf` はリポジトリに置いてある。** 投影機に PowerPoint が無いとき、
-生徒に配るとき、印刷するときはこれを使う。52ページ・16:9（960×540pt）。
+生徒に配るとき、印刷するときはこれを使う。63ページ・16:9（960×540pt）。
 
 `docs/slides.pptx` を作りなおしたら、次のコマンドで PDF も作りなおす。
 
@@ -303,7 +305,7 @@ class 名（`item` / `item-name` / `item-price` / `item-category` / `item-stock`
 
 - 商品数は30のままにする（`print(len(items))` で `30` を確認する進行になっている）
 - **最安値と最高値は1商品だけ**にする。同額があるとステップ3の答えがぶれる
-- **先頭5商品に3種の在庫を散らす**（ステップ4は `items[:5]` しか見にいかない）
+- **先頭5商品に3種の在庫を散らす**（ステップ6は `items[:5]` しか見にいかない）
 - 価格は数値だけを入れる（「280円」にしない）
 - 在庫は「あり / 残りわずか / 品切れ」の3種を、**詳細ページ側**に置く
 - `<title>` と `<h1>` は別の文字列にする

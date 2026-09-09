@@ -90,7 +90,7 @@ check(prices.count(min(prices)) == 1, "最安値が1商品に定まる",
 check(prices.count(max(prices)) == 1, "最高値が1商品に定まる",
       f"{max(prices)}円が {prices.count(max(prices))} 件。ステップ3のやってみようがぶれる")
 check(all("item-stock" not in i for i in items), "一覧に在庫が出ていない",
-      "一覧に item-stock があるとステップ4の意味がなくなる")
+      "一覧に item-stock があるとステップ6の意味がなくなる")
 check(idx.styles == 0, "HTML に style 属性が無い", "装飾は style.css に出す")
 
 hrefs = [i["_href"] for i in items]
@@ -143,7 +143,7 @@ for p, nb in nbs.items():
           f"{len(found)} 箇所。URL は準備セルにだけ書く")
     base_urls[p] = found[0] if found else None
     check(not found or found[0].endswith("/"), f"{os.path.basename(p)}: BASE_URL が / で終わる",
-          "ステップ4の連結が壊れる")
+          "ステップ6の連結が壊れる")
 check(len(set(base_urls.values())) == 1, "2つのノートブックで BASE_URL が同じ", str(base_urls))
 
 host = re.match(r"https?://[^/]+", base_urls["notebooks/student.ipynb"] or "").group(0) if base_urls["notebooks/student.ipynb"] else ""
@@ -158,7 +158,8 @@ check(sum(s.count("____") for s, _ in cells(nbs["notebooks/instructor.ipynb"])) 
 
 SUBST = [('class_="____"', 'class_="x"'), ('id="____"', 'id="x"'), ("soup.____.", "soup.title."),
          ("requests.get(____)", "requests.get(1)"), ("link.____(", "link.get("),
-         ("price ____ cheapest_price", "price < cheapest_price"), ('find_all("____")', 'find_all("h2")')]
+         ("price ____ cheapest_price", "price < cheapest_price"), ('find_all("____")', 'find_all("h2")'),
+         ("price ____ 120", "price <= 120"), ("prices.____()", "prices.sort()")]
 syn = []
 for p, nb in nbs.items():
     for i, (s, c) in enumerate(cells(nb, "code")):
@@ -214,16 +215,33 @@ refs = [int(m) for m in re.findall(r"スライド(\d+)", docs["docs/lesson-plan.
 bad_ref = sorted({r for r in refs if not 1 <= r <= len(slides)})
 check(not bad_ref, "台本が参照するスライド番号が実在する", f"範囲外: {bad_ref}")
 
-rows = re.findall(r"^\|\s*(\d\d):(\d\d)\s*\|\s*(\d+)\s*\|", docs["docs/lesson-plan.md"], re.M)
+# タイムテーブルはコマごとに別の表になっている。表ごとに、頭からの積み上げを見る
+PERIOD = 50          # 1コマの持ち時間（分）
+groups, cur = [], []
+for line in docs["docs/lesson-plan.md"].splitlines():
+    m = re.match(r"^\|\s*(\d\d):(\d\d)\s*\|\s*(\d+)\s*\|", line)
+    if m:
+        cur.append(m.groups())
+    elif cur:
+        groups.append(cur); cur = []
+if cur:
+    groups.append(cur)
+
 bad_time = []
-for (h1, m1, d), nxt in zip(rows, rows[1:]):
-    if int(h1) * 60 + int(m1) + int(d) != int(nxt[0]) * 60 + int(nxt[1]):
-        bad_time.append(f"{h1}:{m1}+{d}分 → {nxt[0]}:{nxt[1]} が合わない")
-check(rows and not bad_time, "タイムテーブルの時刻が積み上がっている", "; ".join(bad_time))
+for g in groups:
+    if g[0][:2] != ("00", "00"):
+        bad_time.append(f"表の先頭が {g[0][0]}:{g[0][1]}（00:00 から始める）")
+    for (h1, m1, d), nxt in zip(g, g[1:]):
+        if int(h1) * 60 + int(m1) + int(d) != int(nxt[0]) * 60 + int(nxt[1]):
+            bad_time.append(f"{h1}:{m1}+{d}分 → {nxt[0]}:{nxt[1]} が合わない")
+    end = int(g[-1][0]) * 60 + int(g[-1][1]) + int(g[-1][2])
+    if end > PERIOD:
+        bad_time.append(f"1コマが {end}分（{PERIOD}分に収まっていない）")
+check(groups and not bad_time, f"タイムテーブルの時刻が積み上がっている（{len(groups)}コマ）", "; ".join(bad_time))
 
 
 # ============================================================ 5. スナップショット
-print("■ スナップショット（ステップ5）")
+print("■ スナップショット（ステップ7）")
 snapf = "samples/wikipedia-melonpan.html"
 if os.path.exists(snapf):
     s = read(snapf)

@@ -1,6 +1,6 @@
 # Webページから情報を取り出してみよう
 
-高校生向けプログラミング体験授業（60〜90分）の教材一式です。
+高校生向けプログラミング体験授業（**50分×2コマ**）の教材一式です。
 プログラミングも HTML も未経験の人が、Google Colaboratory 上で
 Python の `requests` と Beautiful Soup を使って **Webスクレイピング** を体験します。
 
@@ -43,14 +43,16 @@ HTMLでは、中身に `<div class="item">` のような**目印（タグと cla
 
 授業では次の順で進みます。
 
-| ステップ | やること |
-|---|---|
-| 0 | ページをブラウザで見る |
-| 1 | ページのタイトルを取る |
-| 2 | 商品名を全部並べる |
-| 3 | 値段も取って最安値を探す |
-| 4 | 詳細ページを辿って在庫を見る（発展） |
-| 5 | 本物の Wikipedia 記事を読む（発展） |
+| | ステップ | やること |
+|---|---|---|
+| 1コマ目 | 0 | ページをブラウザで見る |
+| | 1 | ページのタイトルを取る |
+| | 2 | 商品名を全部並べる |
+| 2コマ目 | 3 | 値段も取って最安値を探す |
+| | 4 | ほしいものだけ選ぶ（120円以下・安い順） |
+| | 5 | カテゴリごとに数える（平均を出す） |
+| | 6 | 詳細ページを辿って在庫を見る |
+| | 7 | 本物の Wikipedia 記事を読む（発展） |
 
 ## 大事なマナー
 
@@ -71,8 +73,8 @@ HTMLでは、中身に `<div class="item">` のような**目印（タグと cla
 | `index.html` / `items/` / `style.css` | 練習用サイト（30商品）。`tools/build-site.py` の生成物 |
 | `notebooks/student.ipynb` | 受講生用ノートブック（穴埋め式） |
 | `notebooks/instructor.ipynb` | 講師用ノートブック（解答つき） |
-| `samples/` | ステップ5で読む Wikipedia 記事の保存版 |
-| `docs/slides.md` / `slides.pptx` | 投影用スライド |
+| `samples/` | ステップ7で読む Wikipedia 記事の保存版 |
+| `docs/slides.md` / `slides.pptx` / `slides.pdf` | 投影用スライド |
 | `docs/handout.md` | 受講生用プリント（A4両面2枚） |
 | `docs/lesson-plan.md` | 進行台本（タイムテーブル・想定質問） |
 | `docs/deploy.md` | 公開と変換の手順 |
@@ -83,8 +85,9 @@ HTMLでは、中身に `<div class="item">` のような**目印（タグと cla
 ```bash
 python3 tools/build-site.py       # 商品データ → index.html / items/*.html
 node tools/slides-to-pptx.mjs     # slides.md → slides.pptx
+bash tools/slides-to-pdf.sh       # slides.pptx → slides.pdf
 python3 tools/check-materials.py  # 教材の整合性をチェック
 ```
 
 何かを直したら、最後に `check-materials.py` を通してください。
-`index.html` と `items/*.html`、`docs/slides.pptx` は生成物なので直接編集しません。
+`index.html` と `items/*.html`、`docs/slides.pptx`、`docs/slides.pdf` は生成物なので直接編集しません。
