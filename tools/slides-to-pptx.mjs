@@ -171,6 +171,51 @@ function runs(text, base) {
 
 const plain = (t) => t.replace(/\*\*/g, "").replace(/`/g, "");
 
+/**
+ * HTML のコードブロックを、開きタグと閉じタグが同じ色になるように塗り分ける。
+ * HTML 未習の生徒には「どれとどれが1組か」が最初の壁なので、色で対応づける。
+ * 色は組ごとに変える（入れ子の深さではなく出てきた順）。同じ深さの <h2> と <p> が
+ * 同じ色になると、どれとどれが1組か分からなくなるため。
+ * 複数行にまたがる組は、開きから閉じまでを左の縦線でもつなぐ（spans）。
+ */
+const PAIR = ["B23A00", "0B5A9E", "116B36", "6B2FA0"];   // いずれも白地に 5:1 以上
+
+function htmlPairs(lines, fontPt) {
+  const stack = [], spans = [], runs = [];
+  let opened = 0;   // 何組目か。色はこの順に振る
+  const rows = lines.map((line, li) => {
+    const parts = [];
+    const re = /<\/?[a-zA-Z][\w-]*(?:\s[^>]*?)?\/?>/g;
+    let last = 0, m;
+    while ((m = re.exec(line))) {
+      if (m.index > last) parts.push({ text: line.slice(last, m.index), color: C.text });
+      const tok = m[0];
+      let color;
+      if (tok.startsWith("</")) {                      // 閉じタグ：開きと同じ色にする
+        const open = stack.pop();
+        color = open?.color ?? C.text;
+        if (open && open.line !== li) spans.push({ from: open.line, to: li, depth: open.depth, color });
+      } else {
+        color = PAIR[opened++ % PAIR.length];
+        if (!tok.endsWith("/>")) stack.push({ line: li, depth: stack.length, color });
+      }
+      parts.push({ text: tok, color, bold: true });
+      last = m.index + tok.length;
+    }
+    if (last < line.length) parts.push({ text: line.slice(last), color: C.text });
+    return parts.length ? parts : [{ text: line || " ", color: C.text }];
+  });
+
+  rows.forEach((parts, i) => parts.forEach((p, j) => runs.push({
+    text: p.text,
+    options: {
+      fontFace: FONT_CODE, fontSize: fontPt, color: p.color, bold: !!p.bold,
+      breakLine: j === parts.length - 1 && i < rows.length - 1,
+    },
+  })));
+  return { runs, spans };
+}
+
 // ---------------------------------------------------------------- 描画
 
 const warnings = [];
@@ -310,13 +355,23 @@ function layout(slide, b, fs, big) {
     const widest = Math.max(...b.lines.map(emWidth), 1);
     const cap = b.lines.length >= 9 ? 17 : b.lines.length >= 6 ? 19 : 20;
     const codePt = Math.min(cap, Math.floor(((inner * 72) / widest) * 10) / 10);
-    const h = b.lines.length * lineH(codePt) + 0.3;
+    const pitch = lineH(codePt);
+    const h = b.lines.length * pitch + 0.3;
+    const html = b.lang === "html" ? htmlPairs(b.lines, codePt) : null;
     return { h: h + 0.2, draw: (y) => {
       slide.addShape("roundRect", {
         x: MX, y, w: BODY_W, h, fill: { color: C.codeBg },
         line: { color: C.codeBorder, width: 1 }, rectRadius: 0.06,
       });
-      slide.addText(b.lines.join("\n"), {
+      // 複数行にまたがるペアは、開きから閉じまでを縦線でつなぐ
+      for (const sp of html?.spans ?? []) {
+        slide.addShape("roundRect", {
+          x: MX + 0.09 + sp.depth * 0.08, y: y + 0.15 + sp.from * pitch + 0.02,
+          w: 0.04, h: (sp.to - sp.from + 1) * pitch - 0.04,
+          fill: { color: sp.color }, line: { color: sp.color, width: 0 }, rectRadius: 0.02,
+        });
+      }
+      slide.addText(html ? html.runs : b.lines.join("\n"), {
         x: MX + 0.18, y: y + 0.15, w: inner, h: h - 0.3,
         fontSize: codePt, fontFace: FONT_CODE, color: C.text, valign: "top", lineSpacingMultiple: 1.06,
       });
