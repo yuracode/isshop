@@ -33,7 +33,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 python3 tools/build-site.py       # DATA → index.html / items/*.html
 node tools/slides-to-pptx.mjs     # slides.md → slides.pptx（npm run slides でも同じ）
-python3 tools/check-materials.py  # 教材の整合性を31項目チェック（外部ツール不要）
+python3 tools/check-materials.py  # 教材の整合性をまとめてチェック（外部ツール不要）
 bash tools/render-slides.sh       # pptx を描画して、消えた文字が無いか確認
 bash tools/slides-to-pdf.sh       # slides.pptx → slides.pdf（Windows の PowerPoint 経由）
 ```
@@ -54,6 +54,9 @@ node tools/slides-to-pptx.mjs docs/slides.md /tmp/before.pptx
 | PDF 化（`slides-to-pdf.sh`） | Windows 側の PowerPoint（WSL から呼ぶ。詳細は `docs/deploy.md`） |
 
 `build-site.py` と `check-materials.py` は Python だけで動く。外部ツールは要らない。
+
+ノートブックを機械的に直すときは `json.dump(nb, f, ensure_ascii=False, indent=1)` ＋末尾改行。
+既定の `json.dump` だと日本語がエスケープされ、全行が差分になる。
 
 **何を直しても、最後に `check-materials.py` を通す。**
 NG が1件でもあれば終了コード 1 を返すので、成否はそのまま機械で判定できる。
@@ -225,6 +228,7 @@ names = soup.find_all("div", class_="____")   # ← ここだけ埋める
 | ステップの所要時間 | 台本のタイムテーブル（通しの1本。00:00 から積み上げ、全体100分以内） |
 | 公開URL | ノートブックの `BASE_URL` とステップ0のリンク、台本、`deploy.md`、`README.md`（Colab バッジのリンクも） |
 | `samples/` の記事 | ステップ7が前提にする3点（`add-snapshot` スキル） |
+| 外部アクセスの User-Agent | `instructor.ipynb` の7-5・7-6と `add-snapshot` スキルの `UA=` の3箇所。現行は `CyberInstruction/1.0 (https://github.com/yuracode) requests`。**連絡先（URL かメール）を必ず残す** |
 
 ## 8. 公開
 
@@ -234,7 +238,7 @@ names = soup.find_all("div", class_="____")   # ← ここだけ埋める
 
 ## 9. 完成の判定
 
-`python3 tools/check-materials.py` が31項目を自動で確認する。**以下は人がやる。**
+`python3 tools/check-materials.py` が通ることが前提。**以下は人がやる。**
 
 - [ ] `student.ipynb` を Colab で上から順に実行し、空欄を埋めれば全て動く
 - [ ] ステップ1が実行から結果表示まで10秒以内
@@ -262,4 +266,5 @@ names = soup.find_all("div", class_="____")   # ← ここだけ埋める
 | スライドは描画して確認する | 高さの見積もりだけでは「pptx に文字はあるのに描画されると消える」事故が起きる。`render-slides.sh` が全文突き合わせる |
 | HTML は生成物にした | 30ページを手で揃えるのは無理。`build-site.py` の `DATA` が唯一のソース |
 | 価格は数値だけ | 「280円」だと文字列処理の説明が要る。体験授業では邪魔 |
+| 講師セルの UA は連絡先入り | 既定の `python-requests/2.x` では **403**（実測）。独自の文字列なら名前だけでも 200 は返る（実測）が、Wikimedia は連絡先を求めており、7-5 の山が「**連絡が取れる形で**名乗る」なので、URL かメールを必ず入れる |
 | プリントは A4 4ページ | 早見表を削ると暗記させることになる。2ページには収まらなかった |
