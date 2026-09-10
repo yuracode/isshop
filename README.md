@@ -11,6 +11,9 @@ Python の `requests` と Beautiful Soup を使って **Webスクレイピング
 | 受講生用ノートブック（Colab で開く） | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yuracode/isshop/blob/main/notebooks/student.ipynb) |
 | 練習用サイト「サイバー購買部」 | https://yuracode.github.io/isshop/ |
 
+> **リンクは Ctrl＋クリック**（Mac は ⌘＋クリック）**で開くと、このページを残したまま新しいタブに出せます。**
+> 練習用サイトと Colab を行き来するので、両方タブで開いておくと便利です。
+
 Colab のリンクを開いて、上のセルから順に実行していけば授業が進みます。
 インストールや環境構築は必要ありません（Colab に最初から入っているものだけを使います）。
 
