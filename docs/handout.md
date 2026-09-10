@@ -158,10 +158,12 @@ Webページは、**ぜんぶ文字で書かれた設計図**でできていま�
 | `int("150")` | **文字の150** を **数の150** に変える |
 | `for item in items:` | `items` **ぜんぶに対して**1つずつ。取り出した1個が `item` |
 | `if price <= 120:` | **もし〜なら**（条件に合うときだけ実行） |
-| `prices.append(x)` | リストの**後ろに足す** |
+| `prices.append((price, name))` | リストの**後ろに足す**（`(a, b)` は **2つで1組**） |
+| `for price, name in prices:` | 組の**左**が `price`、**右**が `name` に入る |
 | `prices.sort()` | **小さい順**にならべかえる（`reverse=True` で大きい順） |
 | `totals = {}` | **辞書**。名前で覚えておく入れもの |
 | `totals.get(cat, 0)` | まだ無ければ **0** として取り出す |
+| `for cat in totals:` | 辞書の**名札を1つずつ** |
 | `round(118.33)` | 四捨五入する |
 | `time.sleep(1)` | 1秒待つ |
 
