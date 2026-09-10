@@ -56,6 +56,12 @@ node tools/slides-to-pptx.mjs docs/slides.md /tmp/before.pptx
 `build-site.py` と `check-materials.py` は Python だけで動く。外部ツールは要らない。
 
 **何を直しても、最後に `check-materials.py` を通す。**
+NG が1件でもあれば終了コード 1 を返すので、成否はそのまま機械で判定できる。
+
+### コミット
+
+メッセージは**日本語・過去形**で、何をしたかを1行で書く（`教材からコマの区切りを外し、for と文字列の補足を足した`）。
+英語で書かない。リポジトリ全体がこの形で揃っている。
 
 ### スキル
 
