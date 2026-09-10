@@ -249,9 +249,9 @@ if os.path.exists(snapf):
           "h1#firstHeading がある", "5-2 が動かなくなる")
     h2 = [html.unescape(re.sub(r"<[^>]+>", "", m)).strip() for m in re.findall(r"<h2[^>]*>(.*?)</h2>", s, re.S)]
     check(h2 and h2[0] == "目次", "find_all('h2') の1つ目が「目次」",
-          f"実際: {h2[:1]}。5-3 の「いらないものが混ざる」が成立しない")
+          f"実際: {h2[:1]}。7-3 の「いらないものが混ざる」が成立しない")
     p1 = re.search(r"<p(?:\s[^>]*)?>(.*?)</p>", s, re.S)
-    check(p1 and "<sup" in p1.group(1), "最初の <p> に脚注 <sup> がある", "5-4 の掃除の題材が無くなる")
+    check(p1 and "<sup" in p1.group(1), "最初の <p> に脚注 <sup> がある", "7-4 の掃除の題材が無くなる")
     outer = sum(s.count(x) for x in ['src="//', 'src="http', "<script src", '<link rel'])
     check(outer == 0, "スナップショットに外部リソース参照が無い", f"{outer} 件。授業中に外部へ出てしまう")
 else:
