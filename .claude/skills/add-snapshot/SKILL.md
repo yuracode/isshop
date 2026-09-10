@@ -22,7 +22,7 @@ GitHub Pages 経由で全員がそれを読む。** 体験は「本物の HTML �
 **1回だけ取得する。ループで回さない。**
 
 ```bash
-UA='CyberKoubaibu-LessonSnapshot/1.0 (https://github.com/yuracode/isshop) curl'
+UA='CyberInstruction-Snapshot/1.0 (https://github.com/yuracode) curl'
 curl -sS -A "$UA" -o /tmp/raw.html "https://ja.wikipedia.org/wiki/メロンパン"
 ```
 
