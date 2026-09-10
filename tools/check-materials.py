@@ -215,8 +215,9 @@ refs = [int(m) for m in re.findall(r"スライド(\d+)", docs["docs/lesson-plan.
 bad_ref = sorted({r for r in refs if not 1 <= r <= len(slides)})
 check(not bad_ref, "台本が参照するスライド番号が実在する", f"範囲外: {bad_ref}")
 
-# タイムテーブルはコマごとに別の表になっている。表ごとに、頭からの積み上げを見る
-PERIOD = 50          # 1コマの持ち時間（分）
+# タイムテーブルは通しの1本。頭からの積み上げが合っているかを見る
+# （どこで区切るかは講師が決めるので、コマ単位ではチェックしない）
+TOTAL = 100          # 授業全体の上限（分）
 groups, cur = [], []
 for line in docs["docs/lesson-plan.md"].splitlines():
     m = re.match(r"^\|\s*(\d\d):(\d\d)\s*\|\s*(\d+)\s*\|", line)
@@ -235,9 +236,9 @@ for g in groups:
         if int(h1) * 60 + int(m1) + int(d) != int(nxt[0]) * 60 + int(nxt[1]):
             bad_time.append(f"{h1}:{m1}+{d}分 → {nxt[0]}:{nxt[1]} が合わない")
     end = int(g[-1][0]) * 60 + int(g[-1][1]) + int(g[-1][2])
-    if end > PERIOD:
-        bad_time.append(f"1コマが {end}分（{PERIOD}分に収まっていない）")
-check(groups and not bad_time, f"タイムテーブルの時刻が積み上がっている（{len(groups)}コマ）", "; ".join(bad_time))
+    if end > TOTAL:
+        bad_time.append(f"全体が {end}分（{TOTAL}分に収まっていない）")
+check(groups and not bad_time, f"タイムテーブルの時刻が積み上がっている（計{end}分）", "; ".join(bad_time))
 
 
 # ============================================================ 5. スナップショット
