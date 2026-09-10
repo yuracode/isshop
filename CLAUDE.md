@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 高校生向けプログラミング体験授業「Webページから情報を取り出してみよう」の教材一式。
 プログラミングも HTML も未経験の高校生が、Colab で Beautiful Soup を触る **計約90分**。
 **どこで区切るかは講師が決める。教材側にコマの区切りを書かない。**
@@ -14,7 +16,7 @@
 |---|---|---|
 | `index.html` / `items/*.html` | 練習用サイト（30商品） | **✗ 生成物。`tools/build-site.py` を直す** |
 | `style.css` | サイトの見た目 | ○ |
-| `samples/` | ステップ5で読む Wikipedia の保存版 | 手順は `add-snapshot` スキル |
+| `samples/` | ステップ7で読む Wikipedia の保存版 | 手順は `add-snapshot` スキル |
 | `notebooks/student.ipynb` | 受講生用（穴埋め） | ○ |
 | `notebooks/instructor.ipynb` | 講師用（解答＋メモ） | ○ |
 | `docs/slides.md` | 投影用スライドの原稿（Marp） | ○ |
